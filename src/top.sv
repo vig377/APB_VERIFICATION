@@ -17,13 +17,13 @@ forever #10 clk=~clk;
 end
 initial begin
 reset=0;
-@(posedge clk);
+//@(posedge clk);
 reset=1;
 
-@(posedge clk);
+//@(posedge clk);
 reset=0;
 
-@(posedge clk);
+//@(posedge clk);
 reset=1;
 end
 

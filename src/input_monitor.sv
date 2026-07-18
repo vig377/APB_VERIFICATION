@@ -12,50 +12,49 @@ PWRITE:coverpoint im.pwrite{bins b6[]={0,1};}
 cr:cross PSEL,PENABLE;
 endgroup
 function new(mailbox #(apb_trans)im_ref,virtual apb.im vif);
-this.im_ref=im_ref;
-this.vif=vif;
-cg=new;
+  this.im_ref=im_ref;
+  this.vif=vif;
+  cg=new;
 endfunction
 task start();
-fork
-begin
-forever begin
-@(negedge vif.reset);
-im=new;
-im.reset=0;
-im.psel    = 0;
-im.penable = 0;
-im.pwrite  = 0;
-im.paddr   = 0;
-im.pwdata  = 0;
-im.pstrb   = 0;
-im.pready  = 0;
-$display("INPUT MONITOR : RESET transaction sent at time %t",$time);
-im_ref.put(im.copy());
-end
-end
-begin
-repeat(2)@(vif.input_mon_cb);
-for(int i=0;i<`no;i++)
-begin
-im=new;
-wait(vif.reset);
-repeat(1)@(vif.input_mon_cb);
-im.pwdata=vif.input_mon_cb.pwdata;
-im.paddr=vif.input_mon_cb.paddr;
-im.psel=vif.input_mon_cb.psel;
-im.penable=vif.input_mon_cb.penable;
-im.pwrite=vif.input_mon_cb.pwrite;
-im.pstrb=vif.input_mon_cb.pstrb;
-im.pready=vif.input_mon_cb.pready;
-im.reset=vif.reset;
-cg.sample();
-$display("input monitor (from interface) :pwdata =%d paddr=%d pstrb=%d psel=%d penable=%d pwrite =%d at time=%d \n",im.pwdata,im.paddr,im.pstrb,im.psel,im.penable,im.pwrite,$time);
-im_ref.put(im.copy());
-end
-end
+  fork
+  begin
+    forever begin
+      @(negedge vif.reset);
+      im=new;
+      im.reset=0;
+      im.psel    = 0;
+      im.penable = 0;
+      im.pwrite  = 0;
+      im.paddr   = 0;
+      im.pwdata  = 0;
+      im.pstrb   = 0;
+      im.pready  = 0;
+      $display("INPUT MONITOR : RESET transaction sent at time %t",$time);
+      im_ref.put(im.copy());
+      end
+    end
+    begin
+      repeat(2)@(vif.input_mon_cb);
+        for(int i=0;i<`no*2;i++)
+      begin
+      im=new;
+      wait(vif.reset);
+      repeat(1)@(vif.input_mon_cb);
+      im.pwdata=vif.input_mon_cb.pwdata;
+      im.paddr=vif.input_mon_cb.paddr;
+      im.psel=vif.input_mon_cb.psel;
+      im.penable=vif.input_mon_cb.penable;
+      im.pwrite=vif.input_mon_cb.pwrite;
+      im.pstrb=vif.input_mon_cb.pstrb;
+      im.pready=vif.input_mon_cb.pready;
+      im.reset=vif.reset;
+      cg.sample();
+      $display("input monitor (from interface) :pwdata =%d paddr=%d pstrb=%d psel=%d penable=%d pwrite =%d at time=%d \n",im.pwdata,im.paddr,im.pstrb,im.psel,im.penable,im.pwrite,$time);
+      im_ref.put(im.copy());
+    end
+  end
 
-join_none
+  join_none
 endtask
 endclass
-

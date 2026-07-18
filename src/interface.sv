@@ -18,7 +18,7 @@ interface apb(input bit clk,reset);
 
 	clocking output_mon_cb@(posedge clk);
 		default input #0 output  #0;
-		input pslverr,pready,prdata;
+		input pslverr,pready,prdata,paddr,psel,penable;
 	endclocking
 
 	modport driv(clocking driv_cb,input reset);
